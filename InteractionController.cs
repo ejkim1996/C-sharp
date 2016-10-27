@@ -20,19 +20,19 @@ public class InteractionController : MonoBehaviour {
 		if (joint == null && device.GetTouchDown(triggerButton) && pickup != null)
 		{
             pickup.transform.parent = this.transform;
-			pickup.transform.position = attachPoint.transform.position;
+			// pickup.transform.position = attachPoint.transform.position;
 
 			joint = pickup.AddComponent<FixedJoint>();
 			joint.connectedBody = attachPoint;
 		}
-		else if (joint != null && device.GetTouchUp(triggerButton) && pickup != null)
+		else if (joint != null && device.GetTouchUp(triggerButton))
 		{
             pickup.transform.parent = null;
 			var go = joint.gameObject;
 			var rigidbody = go.GetComponent<Rigidbody>();
 			Object.DestroyImmediate(joint);
 			joint = null;
-			Object.Destroy(go, 15.0f);
+			// Object.Destroy(go, 15.0f);
 
 			// We should probably apply the offset between trackedObj.transform.position
 			// and device.transform.pos to insert into the physics sim at the correct
