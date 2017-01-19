@@ -1,4 +1,8 @@
-﻿using UnityEngine;
+﻿/* @author Sean Lee
+https://github.com/b0ard/YoutubeVive/blob/c81f35bbe3f7904bc4890c7c9713fafa1229f534/Assets/WandController.cs
+*/
+
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 

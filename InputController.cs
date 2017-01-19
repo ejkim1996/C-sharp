@@ -2,24 +2,28 @@
 using System.Collections;
 
 public class InputController : MonoBehaviour {
+    //set up variables
+    private SteamVR_Controller.Device device;
+    private SteamVR_TrackedObject trackedObj;
 	private Valve.VR.EVRButtonId triggerButton = Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger;
     private Valve.VR.EVRButtonId gripButton = Valve.VR.EVRButtonId.k_EButton_Grip;
-    private SteamVR_TrackedObject trackedObj;
-    private SteamVR_Controller.Device device;
-    public string whichController;
+    public string whichController; //set after the script is attached to assign two of four methods in this script
 
 	// Use this for initialization
 	void Start () {
+        //set trackedObj from the SteamVR_TrackedObject component of the controller
 		trackedObj = GetComponent<SteamVR_TrackedObject>();
 	}
 	
 	// Update is called once per frame
 	void Update () {
+        //set the device reference using the trackedObj index.
 		device = SteamVR_Controller.Input((int)trackedObj.index);
 
+        //make the "right" controller's trigger button start/stop the rotation and its
+        //grip button to increase the speed
         if (whichController == "right"){
              if (device.GetPressDown(triggerButton)) {
-                Debug.Log("Right trigger pressed.");
                 if (Rotator.rotate == false && Rotator.begin) {
                     Rotator.speed = 20 * Rotator.direction;
                     Rotator.rotate = true;
@@ -36,12 +40,14 @@ public class InputController : MonoBehaviour {
 			    }
             }
             if (device.GetPressDown(gripButton)) {
-                Debug.Log ("right grip button pressed.");
 			    Rotator.speed += 2 * Rotator.direction;
             }
-        } else if (whichController == "left") {
+        }
+
+        //make the "left" controller's trigger button change the direction of rotation and its
+        //grip button to decrease the speed
+        else if (whichController == "left") {
             if (device.GetPressDown(triggerButton)) {
-                Debug.Log("Left trigger pressed.");
                 Rotator.direction *= -1;
                 Rotator.speed *= -1;
             }
