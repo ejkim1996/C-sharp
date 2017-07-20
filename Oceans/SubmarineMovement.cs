@@ -1,16 +1,21 @@
-﻿/* 
- * 
+﻿/* Script for submarine movement controls.
+ * Use UP/DOWN arrows for forward and backward movement.
+ * Use LEFT/RIGHT arrows for moving left or right.
+ * Use W/S keys for up and down movement.
+ * Joystick controls also supported.
+ * Bobbing up and down, with subtle z-axis rotation implemented
+ *      to simulate effects of underwater currents.
  */ 
 
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SubMovement : MonoBehaviour
+public class SubmarineMovement : MonoBehaviour
 {
     // public variables
     public float movementSpeed = 10f;
-    public float rotationSpeed = 20f;
+    public float rotationSpeed = 50f;
     public float maxSpeed = 10f;
     public float floatStrength = 0.025f;
     public float maxRotation = 2;
@@ -38,12 +43,12 @@ public class SubMovement : MonoBehaviour
     void FixedUpdate()
     {
         //input to move submarine forwards and backwards
-        if (Input.GetKey("up"))
+        if (Input.GetKey("up") || Input.GetAxis("Vertical") > 0.0f)
         {
             forward();
         }
 
-        if (Input.GetKey("down"))
+        if (Input.GetKey("down") || Input.GetAxis("Vertical") < 0.0f)
         {
             backward();
         }
@@ -51,7 +56,7 @@ public class SubMovement : MonoBehaviour
         //input to move submarine up or down
         //isMoving set to true since the submarine should only bob up
         //and down when it isn't moving up or down
-        if (Input.GetKey("w")) 
+        if (Input.GetKey("w") || Input.GetAxis("Depth") > 0.0f) 
         {
             isMoving = true;
             //only go up if the submarine is underwater
@@ -61,7 +66,7 @@ public class SubMovement : MonoBehaviour
             }
         }
 
-        if (Input.GetKey("s"))
+        if (Input.GetKey("s") || Input.GetAxis("Depth") < 0.0f)
         {
             isMoving = true;
             down();
@@ -92,7 +97,7 @@ public class SubMovement : MonoBehaviour
         }
 
         //input for submarine rotation
-        if (Input.GetKey("left") || Input.GetKey("right"))
+        if (Input.GetKey("left") || Input.GetKey("right") || Input.GetAxis("Horizontal") < 0.0f || Input.GetAxis("Horizontal") > 0.0f)
         {
             float rotation = Input.GetAxis("Horizontal") * rotationSpeed * Time.deltaTime;
             rotate(rotation);
@@ -134,7 +139,7 @@ public class SubMovement : MonoBehaviour
 
     void backward()
     {
-        GetComponent<Rigidbody>().AddForce(-1 * transform.forward * (movementSpeed / 4), ForceMode.Acceleration);
+        GetComponent<Rigidbody>().AddForce(-1 * transform.forward * (movementSpeed / 3), ForceMode.Acceleration);
     }
 
     void rotate(float rotation)
