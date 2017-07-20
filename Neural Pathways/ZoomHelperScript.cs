@@ -2,15 +2,26 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/* Helper script containing functions that zooms the camera to the appropriate
+ * neural pathways. Call using ZoomCoyote(), ZoomHuman(), ZoomDolphin, and ZoomOut().
+ * Fades out the head mesh and dims the brain mesh of selected model when zoomed in.
+ * Alpha restored to default when zoomed to other models or zoomed out.
+ * Automatically zooms out after set time.
+ */
+
 public class ZoomHelperScript : MonoBehaviour {
+    //drag and drop GameObjects containing appropriate mesh renderers
     [SerializeField] GameObject CoyoteMesh;
     [SerializeField] GameObject CoyoteBrainMesh;
     [SerializeField] GameObject HumanMesh;
     [SerializeField] GameObject HumanBrainMesh;
     [SerializeField] GameObject DolphinMesh;
     [SerializeField] GameObject DolphinBrainMesh;
+
+    //drag and drop main camera
     [SerializeField] Animator cameraAnimator;
 
+    //MeshRenderer arrays to hold mesh renderers from above game objects
     MeshRenderer[] CoyoteRenderer;
     MeshRenderer[] CoyoteBrainRenderer;
     MeshRenderer[] HumanRenderer;
@@ -18,14 +29,23 @@ public class ZoomHelperScript : MonoBehaviour {
     MeshRenderer[] DolphinRenderer;
     MeshRenderer[] DolphinBrainRenderer;
 
+    //Color objects to change alpha when zooming in or out
     Color dim, fade, restore;
 
+    //string to check where to zoom out from
     string zoomActive = "";
 
+    //variables for auto zoom out, time in seconds
+    public float timeTillZoomOut = 10.0f;
+    float zoomOutTimer;
+    bool zoomedIn = false;
+
+    //floats to hold r, g, b, and alpha values of mesh renderers
     float r, g, b, a;
 
     // Use this for initialization
     void Start () {
+        //fill MeshRenderer[] arrays with renderers from appropriate GameObjects
         CoyoteRenderer = CoyoteMesh.GetComponentsInChildren<MeshRenderer>();
         CoyoteBrainRenderer = CoyoteBrainMesh.GetComponentsInChildren<MeshRenderer>();
         HumanRenderer = HumanMesh.GetComponentsInChildren<MeshRenderer>();
@@ -33,11 +53,14 @@ public class ZoomHelperScript : MonoBehaviour {
         DolphinRenderer = DolphinMesh.GetComponentsInChildren<MeshRenderer>();
         DolphinBrainRenderer = DolphinBrainMesh.GetComponentsInChildren<MeshRenderer>();
 
+        //save default r, g, b, alpha values.
+        //will require more variables if default values are not identical across meshes
         r = CoyoteRenderer[0].material.color.r;
         g = CoyoteRenderer[0].material.color.g;
         b = CoyoteRenderer[0].material.color.b;
         a = CoyoteRenderer[0].material.color.a;
 
+        //set dim, fade, and restore colors.
         dim = new Color(r, g, b, 0.005f);
         fade = new Color(r, g, b, 0);
         restore = new Color(r, g, b, a);
@@ -45,6 +68,7 @@ public class ZoomHelperScript : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+        //keys used for testing
         if (Input.GetKey("a"))
         {
             ZoomCoyote();
@@ -65,10 +89,24 @@ public class ZoomHelperScript : MonoBehaviour {
             ZoomOut();
         }
 
+        //auto zoom out function
+        if (zoomedIn == true)
+        {
+            zoomOutTimer += Time.deltaTime;
+            if (zoomOutTimer > timeTillZoomOut)
+            {
+                ZoomOut();
+                zoomedIn = false;
+            }
+        }
     }
 
-    void ZoomCoyote()
+    //public zoom out functions
+    public void ZoomCoyote()
     {
+        zoomedIn = true;
+        zoomOutTimer = 0.0f;
+
         cameraAnimator.ResetTrigger("human");
         cameraAnimator.ResetTrigger("dolphin");
         cameraAnimator.SetTrigger("coyote");
@@ -83,8 +121,11 @@ public class ZoomHelperScript : MonoBehaviour {
         zoomActive = "coyote";
     }
 
-    void ZoomHuman()
+    public void ZoomHuman()
     {
+        zoomedIn = true;
+        zoomOutTimer = 0.0f;
+
         cameraAnimator.ResetTrigger("coyote");
         cameraAnimator.ResetTrigger("dolphin");
         cameraAnimator.SetTrigger("human");
@@ -99,8 +140,11 @@ public class ZoomHelperScript : MonoBehaviour {
         zoomActive = "human";
     }
 
-    void ZoomDolphin()
+    public void ZoomDolphin()
     {
+        zoomedIn = true;
+        zoomOutTimer = 0.0f;
+
         cameraAnimator.ResetTrigger("human");
         cameraAnimator.ResetTrigger("coyote");
         cameraAnimator.SetTrigger("dolphin");
@@ -115,11 +159,14 @@ public class ZoomHelperScript : MonoBehaviour {
         zoomActive = "dolphin";
     }
 
-    void ZoomOut()
+    public void ZoomOut()
     {
+        zoomedIn = false;
+
         cameraAnimator.ResetTrigger("human");
         cameraAnimator.ResetTrigger("coyote");
         cameraAnimator.ResetTrigger("dolphin");
+
         RestoreCoyote();
         RestoreCoyoteBrain();
         RestoreHuman();
@@ -130,23 +177,24 @@ public class ZoomHelperScript : MonoBehaviour {
         if (zoomActive.Equals("coyote"))
         {
             cameraAnimator.SetTrigger("zoom out from coyote");
-            cameraAnimator.SetTrigger("zoom out");
             zoomActive = "";
         }
         else if (zoomActive.Equals("human"))
         {
             cameraAnimator.SetTrigger("zoom out from human");
-            cameraAnimator.SetTrigger("zoom out");
             zoomActive = "";
         }
         else if (zoomActive.Equals("dolphin"))
         {
             cameraAnimator.SetTrigger("zoom out from dolphin");
-            cameraAnimator.SetTrigger("zoom out");
             zoomActive = "";
         }
+
+        //change animator state to default state so that zoom in functions work properly.
+        cameraAnimator.SetTrigger("zoom out");
     }
 
+    //functions that loop through the appropriate MeshRenderer[] arrays to change the alpha
     void FadeCoyote()
     {
         for (int i = 0; i < CoyoteRenderer.Length; i++)
