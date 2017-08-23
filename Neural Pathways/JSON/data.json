@@ -1,0 +1,177 @@
+{
+  "allAnimalData": [
+    {
+      "name": "COYOTE",
+
+      "senses": [
+        {
+          "name": "Visual",
+
+          "activation": "This text appears when someone touches an eye",
+
+          "facts": [
+
+            "Fact 1",
+
+            "Fact 2",
+
+            "Fact 3"
+          ]
+        },
+
+        {
+
+          "name": "Auditory",
+
+          "activation": "This text appears when someone touches an ear",
+
+          "facts": [
+
+            "Fact 1",
+
+            "Fact 2",
+
+            "Fact 3"
+
+          ]
+
+        },
+
+        {
+
+          "name": "Olfactory",
+
+          "activation": "This text appears when someone touches a nose",
+
+          "facts": [
+
+            "Fact 1",
+
+            "Fact 2",
+
+            "Fact 3"
+
+          ]
+
+        }
+
+      ]
+    },
+
+    {
+      "name": "HUMAN",
+
+      "senses": [
+        {
+          "name": "Visual",
+
+          "activation": "This text appears when someone touches an eye",
+
+          "facts": [
+
+            "Fact 1",
+
+            "Fact 2",
+
+            "Fact 3"
+          ]
+        },
+
+        {
+
+          "name": "Auditory",
+
+          "activation": "This text appears when someone touches an ear",
+
+          "facts": [
+
+            "Fact 1",
+
+            "Fact 2",
+
+            "Fact 3"
+
+          ]
+
+        },
+
+        {
+
+          "name": "Olfactory",
+
+          "activation": "This text appears when someone touches a nose",
+
+          "facts": [
+
+            "Fact 1",
+
+            "Fact 2",
+
+            "Fact 3"
+
+          ]
+
+        }
+
+      ]
+    },
+
+    {
+      "name": "DOLPHIN",
+
+      "senses": [
+        {
+          "name": "Visual",
+
+          "activation": "This text appears when someone touches an eye",
+
+          "facts": [
+
+            "Fact 1",
+
+            "Fact 2",
+
+            "Fact 3"
+          ]
+        },
+
+        {
+
+          "name": "Auditory",
+
+          "activation": "This text appears when someone touches an ear",
+
+          "facts": [
+
+            "Fact 1",
+
+            "Fact 2",
+
+            "Fact 3"
+
+          ]
+
+        },
+
+        {
+
+          "name": "Olfactory",
+
+          "activation": "This text appears when someone touches a nose",
+
+          "facts": [
+
+            "Fact 1",
+
+            "Fact 2",
+
+            "Fact 3"
+
+          ]
+
+        }
+
+      ]
+    }
+  ]
+}
