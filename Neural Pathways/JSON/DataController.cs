@@ -4,7 +4,8 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class DataController : MonoBehaviour {
+public class DataController : MonoBehaviour
+{
 
     private AnimalData[] allAnimalData;
     private AnimalData coyoteData;
@@ -28,8 +29,14 @@ public class DataController : MonoBehaviour {
     private Text[] dolphinTitle;
     private Text[] dolphinActivation;
 
+    private Color orange;
+    private Color yellow;
+    private Color blue;
+    private Color magenta;
+
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
         LoadGameData();
 
         coyoteData = allAnimalData[0];
@@ -53,11 +60,15 @@ public class DataController : MonoBehaviour {
         UnloadRuntimeData("human");
         UnloadRuntimeData("dolphin");
 
-
+        orange = coyoteTitle[0].color;
+        yellow = dolphinTitle[1].color;
+        magenta = coyoteTitle[1].color;
+        blue = humanTitle[1].color;
     }
 
     // Update is called once per frame
-    void Update () {
+    void Update()
+    {
         if (Input.GetKey("q"))
         {
             LoadRuntimeData("coyote", "visual");
@@ -77,13 +88,14 @@ public class DataController : MonoBehaviour {
             LoadRuntimeData("dolphin", "olfactory");
         }
     }
-    
+
     public void LoadRuntimeData(string animal, string sense)
     {
         SensesData senseData = new SensesData();
         AnimalData animalData = new AnimalData();
         Text[] activationData = new Text[4];
         Text[] titleData = new Text[2];
+        Color senseColor = new Color();
 
         if (animal.Equals("coyote"))
         {
@@ -107,18 +119,23 @@ public class DataController : MonoBehaviour {
         if (sense.Equals("visual"))
         {
             senseData = animalData.senses[0];
+            senseColor = magenta;
         }
         else if (sense.Equals("auditory"))
         {
             senseData = animalData.senses[1];
+            senseColor = yellow;
         }
         else if (sense.Equals("olfactory"))
         {
             senseData = animalData.senses[2];
+            senseColor = blue;
         }
 
         titleData[1].text = senseData.name;
+        titleData[1].color = senseColor;
         activationData[0].text = senseData.activation;
+        activationData[0].color = senseColor;
         activationData[1].text = senseData.facts[0];
         activationData[2].text = senseData.facts[1];
         activationData[3].text = senseData.facts[2];
