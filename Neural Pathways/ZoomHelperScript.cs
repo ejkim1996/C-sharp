@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/* Helper script containing functions that zooms the camera to the appropriate
- * neural pathways. Call using ZoomCoyote(), ZoomHuman(), ZoomDolphin, and ZoomOut().
- * Fades out the head mesh and dims the brain mesh of selected model when zoomed in.
- * Alpha restored to default when zoomed to other models or zoomed out.
- * Automatically zooms out after set time.
+/* Helper script containing functions that zooms the appropriate camera to the appropriate
+ * neural pathways. Call using Zoom(animalName), and ZoomOut(animalName). Fades out the head 
+ * mesh and dims the brain mesh of selected model when zoomed in. Alpha restored to default 
+ * when zoomed out.
  */
 
 public class ZoomHelperScript : MonoBehaviour {
@@ -18,27 +17,21 @@ public class ZoomHelperScript : MonoBehaviour {
     [SerializeField] GameObject DolphinMesh;
     [SerializeField] GameObject DolphinBrainMesh;
 
-    //drag and drop main camera
-    [SerializeField] Animator cameraAnimator;
+    //drag and drop cameras
+    [SerializeField] Animator CoyoteAnimator;
+    [SerializeField] Animator HumanAnimator;
+    [SerializeField] Animator DolphinAnimator;
 
     //MeshRenderer arrays to hold mesh renderers from above game objects
-    MeshRenderer[] CoyoteRenderer;
-    MeshRenderer[] CoyoteBrainRenderer;
-    MeshRenderer[] HumanRenderer;
-    MeshRenderer[] HumanBrainRenderer;
-    MeshRenderer[] DolphinRenderer;
-    MeshRenderer[] DolphinBrainRenderer;
+    static MeshRenderer[] CoyoteRenderer;
+    static MeshRenderer[] CoyoteBrainRenderer;
+    static MeshRenderer[] HumanRenderer;
+    static MeshRenderer[] HumanBrainRenderer;
+    static MeshRenderer[] DolphinRenderer;
+    static MeshRenderer[] DolphinBrainRenderer;
 
     //Color objects to change alpha when zooming in or out
-    Color dim, fade, restore;
-
-    //string to check where to zoom out from
-    string zoomActive = "";
-
-    //variables for auto zoom out, time in seconds
-    public float timeTillZoomOut = 10.0f;
-    float zoomOutTimer;
-    bool zoomedIn = false;
+    static Color dim, fade, restore;
 
     //floats to hold r, g, b, and alpha values of mesh renderers
     float r, g, b, a;
@@ -65,229 +58,153 @@ public class ZoomHelperScript : MonoBehaviour {
         fade = new Color(r, g, b, 0);
         restore = new Color(r, g, b, a);
     }
-	
-	// Update is called once per frame
-	void Update () {
-        //keys used for testing
-        if (Input.GetKey("a"))
+
+    //public zoom out functions
+    public void Zoom(string animalName)
+    {
+        if (animalName.Equals("coyote"))
         {
-            ZoomCoyote();
+            CoyoteAnimator.ResetTrigger("zoom out from coyote");
+            CoyoteAnimator.SetTrigger("coyote");
+        }
+        else if (animalName.Equals("human"))
+        {
+            HumanAnimator.ResetTrigger("zoom out from human");
+            HumanAnimator.SetTrigger("human");
+        }
+        else if (animalName.Equals("dolphin"))
+        {
+            DolphinAnimator.ResetTrigger("zoom out from dolphin");
+            DolphinAnimator.SetTrigger("dolphin");
         }
 
-        if (Input.GetKey("s"))
+        //fade out animal mesh and dim the brain mesh
+        Fade(animalName);
+        Dim(animalName);
+    }
+
+    //public zoom out functions
+    public void ZoomOut(string animalName)
+    {
+        if (animalName.Equals("coyote"))
         {
-            ZoomHuman();
+            CoyoteAnimator.ResetTrigger("coyote");
+            CoyoteAnimator.SetTrigger("zoom out from coyote");
+        }
+        else if (animalName.Equals("human"))
+        {
+            HumanAnimator.ResetTrigger("human");
+            HumanAnimator.SetTrigger("zoom out from human");
+        }
+        else if (animalName.Equals("dolphin"))
+        {
+            DolphinAnimator.ResetTrigger("dolphin");
+            DolphinAnimator.SetTrigger("zoom out from dolphin");
         }
 
-        if (Input.GetKey("d"))
-        {
-            ZoomDolphin();
-        }
+        //restore alpha of animal head and brain to default
+        Restore(animalName);
+        RestoreBrain(animalName);
+    }
 
-        if (Input.GetKey("f"))
+    //functions that loop through the appropriate MeshRenderer[] arrays to change the alpha
+    static void Fade(string animalName)
+    {
+        if (animalName.Equals("coyote"))
         {
-            ZoomOut();
-        }
-
-        //auto zoom out function
-        if (zoomedIn == true)
-        {
-            zoomOutTimer += Time.deltaTime;
-            if (zoomOutTimer > timeTillZoomOut)
+            for (int i = 0; i < CoyoteRenderer.Length; i++)
             {
-                ZoomOut();
-                zoomedIn = false;
+                CoyoteRenderer[i].material.color = fade;
+            }
+        }
+        else if (animalName.Equals("human"))
+        {
+            for (int i = 0; i < HumanRenderer.Length; i++)
+            {
+                HumanRenderer[i].material.color = fade;
+            }
+        }
+        else if (animalName.Equals("dolphin"))
+        {
+            for (int i = 0; i < DolphinRenderer.Length; i++)
+            {
+                DolphinRenderer[i].material.color = fade;
             }
         }
     }
 
-    //public zoom out functions
-    public void ZoomCoyote()
+    static void Dim(string animalName)
     {
-        zoomedIn = true;
-        zoomOutTimer = 0.0f;
-
-        cameraAnimator.ResetTrigger("human");
-        cameraAnimator.ResetTrigger("dolphin");
-        cameraAnimator.SetTrigger("coyote");
-
-        RestoreHuman();
-        RestoreHumanBrain();
-        RestoreDolphin();
-        RestoreDolphinBrain();
-        FadeCoyote();
-        DimCoyoteBrain();
-
-        zoomActive = "coyote";
-    }
-
-    public void ZoomHuman()
-    {
-        zoomedIn = true;
-        zoomOutTimer = 0.0f;
-
-        cameraAnimator.ResetTrigger("coyote");
-        cameraAnimator.ResetTrigger("dolphin");
-        cameraAnimator.SetTrigger("human");
-
-        RestoreCoyote();
-        RestoreCoyoteBrain();
-        RestoreDolphin();
-        RestoreDolphinBrain();
-        FadeHuman();
-        DimHumanBrain();
-
-        zoomActive = "human";
-    }
-
-    public void ZoomDolphin()
-    {
-        zoomedIn = true;
-        zoomOutTimer = 0.0f;
-
-        cameraAnimator.ResetTrigger("human");
-        cameraAnimator.ResetTrigger("coyote");
-        cameraAnimator.SetTrigger("dolphin");
-
-        RestoreHuman();
-        RestoreHumanBrain();
-        RestoreCoyote();
-        RestoreCoyoteBrain();
-        FadeDolphin();
-        DimDolphinBrain();
-
-        zoomActive = "dolphin";
-    }
-
-    public void ZoomOut()
-    {
-        zoomedIn = false;
-
-        cameraAnimator.ResetTrigger("human");
-        cameraAnimator.ResetTrigger("coyote");
-        cameraAnimator.ResetTrigger("dolphin");
-
-        RestoreCoyote();
-        RestoreCoyoteBrain();
-        RestoreHuman();
-        RestoreHumanBrain();
-        RestoreDolphin();
-        RestoreDolphinBrain();
-        
-        if (zoomActive.Equals("coyote"))
+        if (animalName.Equals("coyote"))
         {
-            cameraAnimator.SetTrigger("zoom out from coyote");
-            zoomActive = "";
+            for (int i = 0; i < CoyoteBrainRenderer.Length; i++)
+            {
+                CoyoteBrainRenderer[i].material.color = dim;
+            }
         }
-        else if (zoomActive.Equals("human"))
+        else if (animalName.Equals("human"))
         {
-            cameraAnimator.SetTrigger("zoom out from human");
-            zoomActive = "";
+            for (int i = 0; i < HumanBrainRenderer.Length; i++)
+            {
+                HumanBrainRenderer[i].material.color = dim;
+            }
         }
-        else if (zoomActive.Equals("dolphin"))
+        else if (animalName.Equals("dolphin"))
         {
-            cameraAnimator.SetTrigger("zoom out from dolphin");
-            zoomActive = "";
-        }
-
-        //change animator state to default state so that zoom in functions work properly.
-        cameraAnimator.SetTrigger("zoom out");
-    }
-
-    //functions that loop through the appropriate MeshRenderer[] arrays to change the alpha
-    void FadeCoyote()
-    {
-        for (int i = 0; i < CoyoteRenderer.Length; i++)
-        {
-            CoyoteRenderer[i].material.color = fade;
+            for (int i = 0; i < DolphinBrainRenderer.Length; i++)
+            {
+                DolphinBrainRenderer[i].material.color = dim;
+            }
         }
     }
 
-    void FadeHuman()
+    static void Restore(string animalName)
     {
-        for (int i = 0; i < HumanRenderer.Length; i++)
+        if (animalName.Equals("coyote"))
         {
-            HumanRenderer[i].material.color = fade;
+            for (int i = 0; i < CoyoteRenderer.Length; i++)
+            {
+                CoyoteRenderer[i].material.color = restore;
+            }
+        }
+        else if (animalName.Equals("human"))
+        {
+            for (int i = 0; i < HumanRenderer.Length; i++)
+            {
+                HumanRenderer[i].material.color = restore;
+            }
+        }
+        else if (animalName.Equals("dolphin"))
+        {
+            for (int i = 0; i < DolphinRenderer.Length; i++)
+            {
+                DolphinRenderer[i].material.color = restore;
+            }
         }
     }
 
-    void FadeDolphin()
+    static void RestoreBrain(string animalName)
     {
-        for (int i = 0; i < DolphinRenderer.Length; i++)
+        if (animalName.Equals("coyote"))
         {
-            DolphinRenderer[i].material.color = fade;
+            for (int i = 0; i < CoyoteBrainRenderer.Length; i++)
+            {
+                CoyoteBrainRenderer[i].material.color = restore;
+            }
         }
-    }
-
-    void DimCoyoteBrain()
-    {
-        for (int i = 0; i < CoyoteBrainRenderer.Length; i++)
+        else if (animalName.Equals("human"))
         {
-            CoyoteBrainRenderer[i].material.color = dim;
+            for (int i = 0; i < HumanBrainRenderer.Length; i++)
+            {
+                HumanBrainRenderer[i].material.color = restore;
+            }
         }
-    }
-
-    void DimHumanBrain()
-    {
-        for (int i = 0; i < HumanBrainRenderer.Length; i++)
+        else if (animalName.Equals("dolphin"))
         {
-            HumanBrainRenderer[i].material.color = dim;
-        }
-    }
-
-    void DimDolphinBrain()
-    {
-        for (int i = 0; i < DolphinBrainRenderer.Length; i++)
-        {
-            DolphinBrainRenderer[i].material.color = dim;
-        }
-    }
-
-    void RestoreCoyote()
-    {
-        for (int i = 0; i < CoyoteRenderer.Length; i++)
-        {
-            CoyoteRenderer[i].material.color = restore;
-        }
-    }
-
-    void RestoreHuman()
-    {
-        for (int i = 0; i < HumanRenderer.Length; i++)
-        {
-            HumanRenderer[i].material.color = restore;
-        }
-    }
-
-    void RestoreDolphin()
-    {
-        for (int i = 0; i < DolphinRenderer.Length; i++)
-        {
-            DolphinRenderer[i].material.color = restore;
-        }
-    }
-
-    void RestoreCoyoteBrain()
-    {
-        for (int i = 0; i < CoyoteBrainRenderer.Length; i++)
-        {
-            CoyoteBrainRenderer[i].material.color = restore;
-        }
-    }
-
-    void RestoreHumanBrain()
-    {
-        for (int i = 0; i < HumanBrainRenderer.Length; i++)
-        {
-            HumanBrainRenderer[i].material.color = restore;
-        }
-    }
-
-    void RestoreDolphinBrain()
-    {
-        for (int i = 0; i < DolphinBrainRenderer.Length; i++)
-        {
-            DolphinBrainRenderer[i].material.color = restore;
+            for (int i = 0; i < DolphinBrainRenderer.Length; i++)
+            {
+                DolphinBrainRenderer[i].material.color = restore;
+            }
         }
     }
 }
